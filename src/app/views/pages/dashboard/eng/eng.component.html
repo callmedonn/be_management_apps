@@ -1,0 +1,88 @@
+
+<ng-template [ngIf]="!loading && data" [ngIfElse]="onLoading">
+  
+  <div class="col-sm-12 col-md-12 row animated">
+    <div class="col-md-12">
+      <div class="ds-panel full-height bg-orange">
+        <div class="row">
+          <div class="col-md-6 pl-0 d-flex align-items-center justify-content-center">
+            <span class="kt-grid-nav__icon" [inlineSVG]="'./assets/media/icons/svg/Dashboard/ticket.svg'"></span>
+          </div>
+          <div class="col-md-6 d-flex align-items-center">
+            <span class="ds-panel__label">Total Ticket</span>
+          </div>
+        </div>
+        <div class="offset-md-3 col-md-3">
+          <span class="ds-panel__value">{{ data?.ticket.total }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-12 col-md-12 row animated">
+    <div class="col-md-3">
+      <div class="ds-panel full-height bg-orange">
+        <div class="row">
+          <div class="col-md-9 d-flex align-items-center">
+            <span class="ds-panel__label">Total Ticket ( Waiting for Schedule )</span>
+          </div>
+        </div>
+        <div class="offset-md-3 col-md-9">
+          <span class="ds-panel__value">{{ data?.ticket.total }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="ds-panel full-height bg-orange">
+        <div class="row">
+          <div class="col-md-9 d-flex align-items-center">
+            <span class="ds-panel__label">Total Ticket ( Schedule )</span>
+          </div>
+        </div>
+        <div class="offset-md-3 col-md-9">
+          <span class="ds-panel__value">{{ data?.ticket.total }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="ds-panel full-height bg-orange">
+        <div class="row">
+          <div class="col-md-9 d-flex align-items-center">
+            <span class="ds-panel__label">Total Ticket ( Fixed )</span>
+          </div>
+        </div>
+        <div class="offset-md-3 col-md-9">
+          <span class="ds-panel__value">{{ data?.ticket.total }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="ds-panel full-height bg-orange">
+        <div class="row">
+          <div class="col-md-9 d-flex align-items-center">
+            <span class="ds-panel__label">Total Ticket ( Done )</span>
+          </div>
+        </div>
+        <div class="offset-md-3 col-md-9">
+          <span class="ds-panel__value">{{ data?.ticket.total }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #onLoading>
+  <div *ngIf="loading; else hasError" class="col-md-12 loader animated">
+    <mat-spinner diameter="35"></mat-spinner>
+    <p>Loading Content</p>
+  </div>
+
+  <ng-template #hasError>
+    <div class="col-md-12 failure animated">
+      <p>Something went wrong, click the button below to try again.</p>
+      <button (click)="loadData()">
+        Let's try again
+      </button>
+    </div>
+  </ng-template>
+</ng-template>

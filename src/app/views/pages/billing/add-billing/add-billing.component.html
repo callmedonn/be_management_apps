@@ -1,0 +1,323 @@
+<kt-portlet>
+	<kt-portlet-header [title]="getComponentTitle()" [class]="'kt-portlet__head--lg'" [viewLoading$]="loading$">
+		<ng-container ktPortletTools>
+			<a [routerLink]="['/billing']" class="btn btn-secondary kt-margin-r-10" mat-raised-button>
+				<i class="la la-arrow-left"></i>
+				<span class="kt-hidden-mobile">Back</span>
+			</a>
+			<a href="javascript:;" class="btn btn-primary kt-margin-r-10" color="primary" (click)="onSubmit(false)" mat-raised-button >
+				<span class="kt-hidden-mobile">Save</span>
+			</a>
+		</ng-container>
+	</kt-portlet-header>
+
+	<kt-portlet-body>
+		<mat-tab-group [(selectedIndex)]="selectedTab">
+			<mat-tab>
+				<ng-template mat-tab-label>
+					<i class="mat-tab-label-icon fa fa-user"></i>
+					Biling Info
+				</ng-template>
+				<ng-template matTabContent>
+					<!--begin::Form-->
+					<div *ngIf="billing">
+						<form *ngIf="billingForm" [formGroup]="billingForm" class="kt-form kt-form--group-seperator-dashed">
+							<kt-alert *ngIf="hasFormErrors" type="warn" [showCloseButton]="true" [duration]="10000" (close)="onAlertClose($event)">
+								Oh snap! Change a few things up and try submitting again.
+							</kt-alert>
+							<div class="kt-form__section kt-form__section--first">
+								<div class="form-group kt-form__group row">
+									<div class="col-lg-6 kt-margin-bottom-20-mobile">
+										<mat-form-field class="mat-form-field-fluid">
+											<mat-select placeholder="Select Unit" formControlName="unit" #unt (selectionChange)="unitOnChange(unt.value)">
+												<mat-option *ngFor="let item of unitResult" [value]="item._id" >
+													{{item.cdunt}}
+												</mat-option>
+											</mat-select>
+											<mat-error>Unit is
+												<strong>required</strong>
+											</mat-error>
+										</mat-form-field>
+									</div>
+									<div class="col-lg-6 kt-margin-bottom-20-mobile">
+										<mat-form-field class="mat-form-field-fluid">
+											<input matInput placeholder="Billed To" type="text" formControlName="billed_to"/>
+											<mat-error>Billing To is
+												<strong>required</strong>
+											</mat-error>
+										</mat-form-field>
+									</div>
+								</div>
+								<!-- Billing Group -->
+								<div formGroupName="billing">
+									<div class="form-group kt-form__group row" >
+										<div class="col-lg-4 kt-margin-bottom-20-mobile" formGroupName="service_charge">
+											<mat-form-field class="mat-form-field-fluid">
+												<input matInput placeholder="Service Charge" formControlName="amount"/>
+												<span matPrefix>Rp&nbsp;</span>
+												<mat-error>Service Charge is
+													<strong>required</strong>
+												</mat-error>
+											</mat-form-field>
+										</div>
+										<div class="col-lg-4 kt-margin-bottom-20-mobile" formGroupName="sinkingfund">
+											<mat-form-field class="mat-form-field-fluid">
+												<input matInput placeholder="Sinking Fund" formControlName="amountsink"/>
+												<span matPrefix>Rp&nbsp;</span>
+												<mat-error>Sinking fund is
+													<strong>required</strong>
+												</mat-error>
+											</mat-form-field>
+										</div>
+										<div class="col-lg-4 kt-margin-bottom-20-mobile" formGroupName="ipl">
+											<mat-form-field class="mat-form-field-fluid">
+												<input matInput placeholder="IPL" formControlName="amountipl"/>
+												<span matPrefix>Rp&nbsp;</span>
+												<mat-error>Sinking fund is
+													<strong>required</strong>
+												</mat-error>
+											</mat-form-field>
+										</div>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+					<!--end::Form-->
+				</ng-template>
+			</mat-tab>
+			<!-- Billing Detail -->
+			<mat-tab>
+				<ng-template mat-tab-label>
+					<i class="mat-tab-label-icon fa fa-user"></i>
+					Electricity Consumption
+				</ng-template>
+				<ng-template matTabContent>
+					<!--begin::Form-->
+					<div *ngIf="billing">
+						<form *ngIf="billingForm" [formGroup]="billingForm" class="kt-form kt-form--group-seperator-dashed">
+							<kt-alert *ngIf="hasFormErrors" type="warn" [showCloseButton]="true" [duration]="10000" (close)="onAlertClose($event)">
+								Oh snap! Change a few things up and try submitting again.
+							</kt-alert>
+							<div class="kt-form__section kt-form__section--first">
+								<div formGroupName="billing">
+									<div class="form-group kt-form__group row" formGroupName="electricity">
+										<div class="col-lg-6 kt-margin-bottom-20-mobile">
+											<mat-form-field class="mat-form-field-fluid">
+												<mat-select placeholder="Select Electricity Meter" formControlName="electric_trans" #elc (selectionChange)="getDataElectricity(elc.value)">
+													<mat-option *ngFor="let item of powerResult" [value]="item._id" >
+													{{item.pow.nmmtr}}
+													</mat-option>
+												</mat-select>
+											</mat-form-field>
+										</div>
+									</div>
+								</div>
+								<div class="form-group kt-form__group row">
+									<div class="col-lg-4 kt-margin-bottom-20-mobile">
+										<mat-form-field class="mat-form-field-fluid">
+											<input matInput placeholder="Start Consupmtion (kWh)" formControlName="start"/>
+										</mat-form-field>
+									</div>
+									<div class="col-lg-4 kt-margin-bottom-20-mobile">
+										<mat-form-field class="mat-form-field-fluid">
+											<input matInput placeholder="End Consumption (kWh)" formControlName="end"/>
+										</mat-form-field>
+									</div>
+									<div class="col-lg-4 kt-margin-bottom-20-mobile">
+										<mat-form-field class="mat-form-field-fluid">
+											<input matInput placeholder="Consumption Fee (Rp.)" formControlName="poweruse" type="number" (change)="transaksiPower()"/>
+										</mat-form-field>
+									</div>
+								</div>
+								<div class="form-group kt-form__group row">
+									<div class="col-lg-6 kt-margin-bottom-20-mobile">
+										<mat-form-field class="mat-form-field-fluid">
+											<input matInput placeholder="PPJU (%)" formControlName="ppju" type="number" (change)="transaksiPower()" />
+										</mat-form-field>
+									</div>
+									<div class="col-lg-6 kt-margin-bottom-20-mobile">
+										<mat-form-field class="mat-form-field-fluid">
+											<input matInput placeholder="PPJU Fee (Rp.)" formControlName="totalppju"  type="number" />
+										</mat-form-field>
+									</div>
+								</div>
+						
+							    <div class="form-group kt-form__group row">
+									<div class="col-lg-6 kt-margin-bottom-20-mobile">
+										<mat-form-field class="mat-form-field-fluid">
+											<input matInput placeholder="Service Charge (%)" formControlName="servicecharge" />
+										</mat-form-field>
+									</div>
+									<div class="col-lg-6 kt-margin-bottom-20-mobile">
+										<mat-form-field class="mat-form-field-fluid">
+											<input matInput placeholder="Service Charge Fee (Rp.)" formControlName="totalsc" />
+										</mat-form-field>
+									</div>
+								</div>
+								<div class="form-group kt-form__group row">
+									<div class="col-lg-6 kt-margin-bottom-20-mobile">
+										<mat-form-field class="mat-form-field-fluid">
+											<input matInput placeholder="Loss (%)" formControlName="loss" />
+										</mat-form-field>
+									</div>
+									<div class="col-lg-6 kt-margin-bottom-20-mobile">
+										<mat-form-field class="mat-form-field-fluid">
+											<input matInput placeholder="Loss Fee (Rp.)" formControlName="totalloss" />
+										</mat-form-field>
+									</div>
+								</div>
+
+								<div class="form-group kt-form__group row">
+									<div class="col-lg-6 kt-margin-bottom-20-mobile">
+										<mat-form-field class="mat-form-field-fluid">
+											<input matInput placeholder="Total Consumption" formControlName="totalconsumption"/>
+										</mat-form-field>
+									</div>
+								</div>
+
+
+							</div>
+						</form>
+					</div>
+					<!--end::Form-->
+				</ng-template>
+			</mat-tab>
+			<mat-tab>
+				<ng-template mat-tab-label>
+					<i class="mat-tab-label-icon fa fa-user"></i>
+					Water Consumption
+				</ng-template>
+				<ng-template matTabContent>
+					<!--begin::Form-->
+					<div *ngIf="billing">
+						<form *ngIf="billingForm" [formGroup]="billingForm" class="kt-form kt-form--group-seperator-dashed">
+							<kt-alert *ngIf="hasFormErrors" type="warn" [showCloseButton]="true" [duration]="10000" (close)="onAlertClose($event)">
+								Oh snap! Change a few things up and try submitting again.
+							</kt-alert>
+							<div class="kt-form__section kt-form__section--first">
+								<div formGroupName="billing">
+									<div class="form-group kt-form__group row" formGroupName="water">
+										<div class="col-lg-6 kt-margin-bottom-20-mobile">
+											<mat-form-field class="mat-form-field-fluid">
+												<mat-select placeholder="Select Water Meter" formControlName="water_trans" #wtr (selectionChange)="getDataWater(wtr.value)">
+													<mat-option *ngFor="let item of waterResult" [value]="item._id" >
+													{{item.wat.nmmtr}}
+													</mat-option>
+												</mat-select>
+											</mat-form-field>
+										</div>
+									</div>
+								</div>
+								<div class="form-group kt-form__group row">
+									<div class="col-lg-4 kt-margin-bottom-20-mobile">
+										<mat-form-field class="mat-form-field-fluid">
+											<input matInput placeholder="Start Consupmtion (m2)" formControlName="startw"/>
+										</mat-form-field>
+									</div>
+									<div class="col-lg-4 kt-margin-bottom-20-mobile">
+										<mat-form-field class="mat-form-field-fluid">
+											<input matInput placeholder="End Consumption (m2)" formControlName="endw"/>
+										</mat-form-field>
+									</div>
+									<div class="col-lg-4 kt-margin-bottom-20-mobile">
+										<mat-form-field class="mat-form-field-fluid">
+											<input matInput placeholder="Consumption Fee (Rp.)" formControlName="wateruse" type="number" (change)="transaksiWater()"/>
+										</mat-form-field>
+									</div>
+								</div>
+								 <div class="form-group kt-form__group row">
+									<div class="col-lg-6 kt-margin-bottom-20-mobile">
+										<mat-form-field class="mat-form-field-fluid">
+											<input matInput placeholder="Maintenance (Rp.)" formControlName="pemeliharaan" type="number" (change)="transaksiWater()" />
+										</mat-form-field>
+									</div>
+									<div class="col-lg-6 kt-margin-bottom-20-mobile">
+										<mat-form-field class="mat-form-field-fluid">
+											<input matInput placeholder="Administration (Rp.)" formControlName="administrasi" type="number" (change)="transaksiWater()" />
+										</mat-form-field>
+									</div>
+								</div>
+
+								<div class="form-group kt-form__group row">
+									<div class="col-lg-6 kt-margin-bottom-20-mobile">
+										<mat-form-field class="mat-form-field-fluid">
+											<input matInput placeholder="Water Management (%)" formControlName="air_kotor" />
+										</mat-form-field>
+									</div>
+									<div class="col-lg-6 kt-margin-bottom-20-mobile">
+										<mat-form-field class="mat-form-field-fluid">
+											<input matInput placeholder="Water Management Fee (Rp.)" formControlName="totaldt" />
+										</mat-form-field>
+									</div>
+								</div>
+
+								<div class="form-group kt-form__group row">
+									<div class="col-lg-6 kt-margin-bottom-20-mobile">
+										<mat-form-field class="mat-form-field-fluid">
+											<input matInput placeholder="Total Consumption" formControlName="totalconsumptionwater"/>
+										</mat-form-field>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+					<!--end::Form-->
+				</ng-template>
+			</mat-tab>
+			<mat-tab>
+				<ng-template mat-tab-label>
+					<i class="mat-tab-label-icon fa fa-money-bill"></i>
+					Billing Detail
+				</ng-template>
+				<ng-template matTabContent>
+					<div *ngIf="billing">
+						<form *ngIf="billingForm" [formGroup]="billingForm" class="kt-form kt-form--group-seperator-dashed">
+							<div class="form-group kt-form__group row">
+								<div class="col-lg-3 kt-margin-bottom-20-mobile">
+									<mat-form-field class="mat-form-field-fluid">
+										<input matInput placeholder="Billing No." formControlName="billing_number"/>
+										<mat-error>Billing No. is
+											<strong>required</strong>
+										</mat-error>
+									</mat-form-field>
+								</div>
+								<div class="col-lg-3 kt-margin-bottom-20-mobile">
+									<mat-form-field>
+										<input matInput [matDatepicker]="crtdt" placeholder="Created Date" formControlName="created_date"/>
+										<mat-datepicker-toggle matSuffix [for]="crtdt"></mat-datepicker-toggle>
+										<mat-datepicker #crtdt></mat-datepicker>
+										<mat-error>Contract date is
+											<strong>required</strong>
+										</mat-error>
+									</mat-form-field>
+								</div>
+								<div class="col-lg-3 kt-margin-bottom-20-mobile">
+									<mat-form-field>
+										<input matInput [matDatepicker]="billdate" placeholder="Billing Date" (dateInput)="addEvent('input', $event)" (dateChange)="addEvent('change', $event)" formControlName="billing_date"/>
+										<mat-datepicker-toggle matSuffix [for]="billdate"></mat-datepicker-toggle>
+										<mat-datepicker #billdate></mat-datepicker>
+										<mat-error>Billing date is
+											<strong>required</strong>
+										</mat-error>
+									</mat-form-field>
+								</div>
+								<div class="col-lg-3 kt-margin-bottom-20-mobile">
+									<mat-form-field>
+										<input matInput [matDatepicker]="ddate" placeholder="Billing Due Date" formControlName="due_date"/>
+										<mat-datepicker-toggle matSuffix [for]="ddate"></mat-datepicker-toggle>
+										<mat-datepicker #ddate></mat-datepicker>
+										<mat-error>Due date is
+											<strong>required</strong>
+										</mat-error>
+									</mat-form-field>
+								</div>
+								
+							</div>
+						</form>
+					</div>
+				</ng-template>
+			</mat-tab>
+		</mat-tab-group>
+	</kt-portlet-body>
+</kt-portlet>
